@@ -9,15 +9,19 @@
     "babel-loader": "^6.2.4",
     "babel-preset-es2015": "^6.6.0",
     "babel-preset-react": "^6.5.0",
+    "history": "^1.17.0",
     "react": "^0.14.8",
     "react-dom": "^0.14.8",
-    "webpack": "^1.12.14"
+    "react-router": "^2.0.1",
+    "webpack": "^1.12.14",
+    "webpack-dev-server": "^1.14.1"
   },
   "devDependencies": {
     "babel-core": "^6.7.4",
     "babel-loader": "^6.2.4"
   },
   "scripts": {
+    "dev": "webpack-dev-server --content-base src & webpack --watch",
     "test": "test"
   },
   "author": "Mateo Acebedo",
