@@ -1,5 +1,8 @@
 import React from "react";
 import { Link } from "react-router";
+import { NavigationBar } from "../Components/NavigationBar"
+
+
 
 export default class Layout extends React.Component {
 	navigate(){
@@ -9,8 +12,9 @@ export default class Layout extends React.Component {
 	render() {
 		return(
 			<div className="layout">
+				<NavigationBar />
 				{this.props.children}
-				<Link to="archives" className="btn btn-danger">archives</Link>
+				<Link to="archives/" className="btn btn-danger" activeClassName="active">archives</Link>
 				<Link to="featured" className="btn btn-success">Featured</Link>
 				<button onClick={this.navigate.bind(this)}>Featured</button>
 			</div>
