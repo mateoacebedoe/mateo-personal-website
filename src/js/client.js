@@ -3,6 +3,7 @@ import ReactDOM from "react-dom";
 import Layout from "./pages/Layout";
 import Featured from "./pages/Featured";
 import Archives from "./pages/Archives";
+import '../libraries/bootstrap/bootstrap.min.js';
 
 import { Router, Route, IndexRoute, hashHistory} from "react-router";
 //missing Bootstrap js

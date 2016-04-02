@@ -25,7 +25,7 @@
   },
   "scripts": {
     "dev": "webpack-dev-server --content-base src --inline --hot",
-    "test": "test"
+    "test": ""
   },
   "author": "Mateo Acebedo",
   "license": "ISC"

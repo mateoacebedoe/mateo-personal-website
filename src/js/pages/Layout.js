@@ -1,6 +1,6 @@
 import React from "react";
 import { Link } from "react-router";
-import { NavigationBar } from "../Components/NavigationBar"
+import { NavigationBar } from "../Pages/NavigationBar"
 
 
 
