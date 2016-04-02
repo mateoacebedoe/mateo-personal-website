@@ -1,6 +1,6 @@
 import React from "react";
 import { Link } from "react-router";
-//import { NavigationBar } from "../Pages/NavigationBar"
+import { NavBar } from "../components/NavBar";
 
 
 
@@ -12,6 +12,7 @@ export default class Layout extends React.Component {
 	render() {
 		return(
 			<div className="layout">
+				<NavBar />
 				{this.props.children}
 				<Link to="archives/" className="btn btn-danger" activeClassName="active">archives</Link>
 				<Link to="featured" className="btn btn-success">Featured</Link>
