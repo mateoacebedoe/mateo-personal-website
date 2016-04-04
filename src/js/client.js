@@ -1,9 +1,11 @@
 import React from "react";
 import ReactDOM from "react-dom";
 import Layout from "./pages/Layout";
-import Featured from "./pages/Featured";
+import CurrentSprint from "./Components/CurrentSprint";
 import Archives from "./pages/Archives";
+
 import Bootstrap from "bootstrap-without-jquery";
+import d3 from "d3";
 
 
 import { Router, Route, IndexRoute, hashHistory} from "react-router";
@@ -15,9 +17,9 @@ const app = document.getElementById('app');
 ReactDOM.render(
 	<Router history = {hashHistory}>
 		<Route path= "/" component={Layout}>
-			<IndexRoute component={Featured}></IndexRoute>
+			<IndexRoute component={CurrentSprint}></IndexRoute>
 			<Route path="archives(/:article)" component={Archives}></Route>
-			<Route path="featured" component={Featured}></Route>
+			<Route path="current_sprint" component={CurrentSprint}></Route>
 		</Route>
 	</Router>, 
 app);
