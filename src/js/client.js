@@ -5,6 +5,7 @@ import Featured from "./pages/Featured";
 import Archives from "./pages/Archives";
 import Bootstrap from "bootstrap-without-jquery";
 
+
 import { Router, Route, IndexRoute, hashHistory} from "react-router";
 //missing Bootstrap js
 
