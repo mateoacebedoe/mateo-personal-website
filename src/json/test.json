@@ -1,0 +1,9 @@
+{
+"links": [
+{"source":"Energy","target":"Electricity and heat","value":"24.9"}
+] ,
+"nodes": [
+{"name":"Energy"},
+{"name":"Electricity and heat"}
+]
+}

@@ -1,127 +1,59 @@
 import React from "react";
 import sankey from "../plugins/sankey.js";
+import bubbles from "../plugins/bubble_chart.js";
 
 
 export default class CurrentSprint extends React.Component {
 	componentDidMount(){
-
-		const jsonFile = "../json/sankeygreenhouse.json";
-
-		var units = "Widgets";
-		 
-		var margin = {top: 10, right: 10, bottom: 10, left: 10},
-		    width = 800 - margin.left - margin.right,
-		    height = 500 - margin.top - margin.bottom;
-		 
-		var formatNumber = d3.format(",.0f"),    // zero decimal places
-		    format = function(d) { return formatNumber(d) + " " + units; },
-		    color = d3.scale.category20();
-		 
-		// append the svg canvas to the page
-		var svg = d3.select("#chart").append("svg")
-		    .attr("width", width + margin.left + margin.right)
-		    .attr("height", height + margin.top + margin.bottom)
-		  .append("g")
-		    .attr("transform", 
-		          "translate(" + margin.left + "," + margin.top + ")");
-		 
-		// Set the sankey diagram properties
-		var sankey = d3.sankey()
-		    .nodeWidth(36)
-		    .nodePadding(10)
-		    .size([width, height]);
-		 
-		var path = sankey.link();
-		 
-		// load the data
-		d3.json(jsonFile, function(error, graph) {
-		 
-		    var nodeMap = {};
-		    graph.nodes.forEach(function(x) { nodeMap[x.name] = x; });
-		    graph.links = graph.links.map(function(x) {
-		      return {
-		        source: nodeMap[x.source],
-		        target: nodeMap[x.target],
-		        value: x.value
-		      };
-		    });
-		 
-		  sankey
-		      .nodes(graph.nodes)
-		      .links(graph.links)
-		      .layout(32);
-		 
-		// add in the links
-		  var link = svg.append("g").selectAll(".link")
-		      .data(graph.links)
-		    .enter().append("path")
-		      .attr("class", "link")
-		      .attr("d", path)
-		      .style("stroke-width", function(d) { return Math.max(1, d.dy); })
-		      .sort(function(a, b) { return b.dy - a.dy; });
-		 
-		// add the link titles
-		  link.append("title")
-		        .text(function(d) {
-		      	return d.source.name + " → " + 
-		                d.target.name + "\n" + format(d.value); });
-		 
-		// add in the nodes
-		  var node = svg.append("g").selectAll(".node")
-		      .data(graph.nodes)
-		    .enter().append("g")
-		      .attr("class", "node")
-		      .attr("transform", function(d) { 
-				  return "translate(" + d.x + "," + d.y + ")"; })
-		    .call(d3.behavior.drag()
-		      .origin(function(d) { return d; })
-		      .on("dragstart", function() { 
-				  this.parentNode.appendChild(this); })
-		      .on("drag", dragmove));
-		 
-		// add the rectangles for the nodes
-		  node.append("rect")
-		      .attr("height", function(d) { return d.dy; })
-		      .attr("width", sankey.nodeWidth())
-		      .style("fill", function(d) { 
-				  return d.color = color(d.name.replace(/ .*/, "")); })
-		      .style("stroke", function(d) { 
-				  return d3.rgb(d.color).darker(2); })
-		    .append("title")
-		      .text(function(d) { 
-				  return d.name + "\n" + format(d.value); });
-		 
-		// add in the title for the nodes
-		  node.append("text")
-		      .attr("x", -6)
-		      .attr("y", function(d) { return d.dy / 2; })
-		      .attr("dy", ".35em")
-		      .attr("text-anchor", "end")
-		      .attr("transform", null)
-		      .text(function(d) { return d.name; })
-		    .filter(function(d) { return d.x < width / 2; })
-		      .attr("x", 6 + sankey.nodeWidth())
-		      .attr("text-anchor", "start");
-		 
-		// the function for moving the nodes
-		  function dragmove(d) {
-		    d3.select(this).attr("transform", 
-		        "translate(" + (
-		        	   d.x = Math.max(0, Math.min(width - d.dx, d3.event.x))
-		        	) + "," + (
-		                   d.y = Math.max(0, Math.min(height - d.dy, d3.event.y))
-		            ) + ")");
-		    sankey.relayout();
-		    link.attr("d", path);
-		  }
-		});
+		d3.run_bubbles();
 	}
 
 	render() {
+
+		const search_button_style={display:"none"};
+		const g_tip_style={
+							width:"150px",
+							height:"80px",
+							display:"none"
+						};
+
 		return(
 			<div id="currentSprint">
 				<h1>This is a container for my chart</h1>
-				<div id="chart"></div>
+				<div class="g-content">
+					<div class="g-graphic">
+						<div class="g-search">
+							<input type="text" placeholder="Find a company or industry&hellip;"/>
+							<button style={search_button_style} class="g-search-clear">X</button>
+						</div>
+						<div class="g-buttons">
+							<button class="g-button g-active" data-view="overall">The Overall Picture</button>
+							<button class="g-button" data-view="sector">The View by Industry</button>
+						</div>
+					</div>
+					<div class="g-sector-notes"></div>
+					<div class="g-tip" style={g_tip_style}>
+						<div class="g-tip-shadow"></div>
+						<svg class="g-tip-box" width="150" height="87">
+						<path transform="translate(75,91)" d="M0.5,-6.5l5,-5H74.5v-79H-74.5v79H-5Z"></path>
+						</svg>
+						<div class="g-tip-content">
+							<div class="g-tip-title">Apple</div>
+							<div class="g-tip-metric" data-name="rate">
+								<span class="g-tip-metric-name">Effective tax rate</span>
+								<span class="g-tip-metric-value">14%</span>
+							</div>
+							<div class="g-tip-metric" data-name="taxes">
+								<span class="g-tip-metric-name">Taxes paid</span>
+								<span class="g-tip-metric-value">$4.3B</span>
+							</div>
+							<div class="g-tip-metric" data-name="earnings">
+								<span class="g-tip-metric-name">Earnings</span>
+								<span class="g-tip-metric-value">$16.2B</span>
+							</div>
+						</div>
+					</div>
+				</div>
 			</div>
 
 		);
