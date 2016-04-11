@@ -1,8 +1,8 @@
 import d3 from "d3";
 
 d3.run_bubbles = function(){
-	console.log("FUUFCK");
-	
+	const data = "../json/companies.tsv";
+
 	var margin = {top: 20, right: 95, bottom: 10, left: 125},
     width = 970 - margin.left - margin.right,
     height,
@@ -13,27 +13,33 @@ d3.run_bubbles = function(){
 	    formatNumber = d3.format(",.3s"),
 	    formatDollars = function(d) { return (d < 0 ? "-" : "") + "$" + formatNumber(Math.abs(d)).replace(/G$/, "B"); };
 
-	var nameAll = "S.\x26P.\xa0500 companies";
+	var nameAll = "My learning timeline";
 
+	//x scale. 
 	var x = d3.scale.linear()
 	    .domain([0, .6])
 	    .rangeRound([0, width - 60])
 	    .clamp(true)
 	    .nice();
 
+	//empty for now
 	var y = d3.scale.ordinal();
 
+	//the number in the range controls the y0 (where the y axis is centered around)
 	var y0 = d3.scale.ordinal()
 	    .domain([nameAll])
 	    .range([150]);
 
+	//scale for the circles' radius
 	var r = d3.scale.sqrt()
 	    .domain([0, 1e9])
 	    .range([0, 1]);
 
+	//this is the scales for the bubble's color
 	var z = d3.scale.threshold()
 	    .domain([.1, .2, .3, .4, .5])
 	    .range(["#b35806", "#f1a340", "#fee0b6", "#d8daeb", "#998ec3", "#542788"].reverse());
+
 
 	var xAxis = d3.svg.axis()
 	    .scale(x)
@@ -94,7 +100,7 @@ d3.run_bubbles = function(){
 	    .attr("dy", "1em")
 	    .text("2007-12");
 
-	d3.tsv("http://graphics8.nytimes.com/newsgraphics/2013/05/13/corporate-taxes/ee84b0191a75f5c652087293ab0efd4710e21f94/companies.tsv", type, function(error, companies) {
+	d3.tsv(data, type, function(error, companies) {
 	  var sectors = d3.nest()
 	      .key(function(d) { return d.sector; })
 	      .entries(companies);
