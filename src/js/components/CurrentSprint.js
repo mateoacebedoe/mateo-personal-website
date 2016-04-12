@@ -1,5 +1,4 @@
 import React from "react";
-import sankey from "../plugins/sankey.js";
 import bubbles from "../plugins/bubble_chart.js";
 
 

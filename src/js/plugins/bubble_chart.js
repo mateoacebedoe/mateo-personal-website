@@ -1,7 +1,7 @@
 import d3 from "d3";
 
 d3.run_bubbles = function(){
-	const data = "../json/companies.tsv";
+	const data = "../json/learnings.csv";
 
 	var margin = {top: 20, right: 95, bottom: 10, left: 125},
     width = 970 - margin.left - margin.right,
@@ -13,7 +13,7 @@ d3.run_bubbles = function(){
 	    formatNumber = d3.format(",.3s"),
 	    formatDollars = function(d) { return (d < 0 ? "-" : "") + "$" + formatNumber(Math.abs(d)).replace(/G$/, "B"); };
 
-	var nameAll = "My learning timeline";
+	var nameAll = "Learning Timeline";
 
 	//x scale. 
 	var x = d3.scale.linear()
@@ -52,10 +52,6 @@ d3.run_bubbles = function(){
 	    .orient("left")
 	    .tickSize(-width + 60 - tickExtension * 2, 0)
 	    .tickPadding(6);
-
-	var quadtree = d3.geom.quadtree()
-	    .x(function(d) { return d.x; })
-	    .y(function(d) { return d.y; });
 
 	var svg = d3.select(".g-graphic").append("svg")
 	    .attr("height", 420 + margin.top + margin.bottom)
@@ -100,7 +96,9 @@ d3.run_bubbles = function(){
 	    .attr("dy", "1em")
 	    .text("2007-12");
 
-	d3.tsv(data, type, function(error, companies) {
+	d3.csv(data, type, function(error, companies) {
+	  
+	  //changing the data structure to represent the parent to child relationship between sectors and companies
 	  var sectors = d3.nest()
 	      .key(function(d) { return d.sector; })
 	      .entries(companies);
@@ -125,34 +123,38 @@ d3.run_bubbles = function(){
 
 	  height = 120 * sectors.length;
 
+	  //here we setting our y scale to map sectors to 12 numbers within 0 and 12*sectors.length
 	  y
 	      .domain(sectors.map(function(d) { return d.key; }))
 	      .rangePoints([10, height], 1);
 
+	 //yAxis for multiple sectors
 	  svg.append("g")
 	      .attr("class", "g-y g-axis g-y-axis-sector")
 	      .attr("transform", "translate(-" + tickExtension + ",0)")
 	      .call(yAxis.scale(y))
-	      .call(yAxisWrap)
+	      .call(yAxisWrap) //wraps the text of the element
 	      .style("stroke-opacity", 0)
 	      .style("fill-opacity", 0)
 	    .selectAll(".tick text,.tick tspan")
 	      .attr("x", -95)
 	      .style("text-anchor", "start");
 
+	  //yAxis for the overall view
 	  svg.append("g")
 	      .attr("class", "g-y g-axis g-y-axis-overall")
 	      .attr("transform", "translate(-" + tickExtension + ",0)")
 	      .call(yAxis.scale(y0))
 	      .call(yAxisWrap);
 
+	  //rendering the different circles. Default is the overrall view
 	  var companyClip = svg.append("defs").selectAll("clipPath")
 	      .data(companies)
 	    .enter().append("clipPath")
 	      .attr("id", function(d, i) { return "g-clip-company-" + i; })
 	    .append("circle")
 	      .attr("cx", function(d) { return d.cx; })
-	      .attr("cy", function(d) { return d.cy - y0(nameAll); })
+	      .attr("cy", function(d) { return d.cy - y0(nameAll); })//centering around the overall Y0
 	      .attr("r", function(d) { return r(d.capitalization) + 20; });
 
 	  var gVoronoi = svg.append("g")
@@ -164,11 +166,6 @@ d3.run_bubbles = function(){
 	      .attr("clip-path", function(d, i) { return "url(#g-clip-company-" + i + ")"; })
 	      .on("mouseover", mouseover)
 	      .on("mouseout", mouseout);
-
-	  gVoronoi.call(updateVoronoi,
-	      function(d) { return d.cx; },
-	      function(d) { return d.cy + y0(nameAll); },
-	      420);
 
 	  var sector = svg.append("g")
 	      .attr("class", "g-sector")
@@ -314,10 +311,7 @@ d3.run_bubbles = function(){
 	        .delay(720)
 	        .attr("height", 420 + margin.top + margin.bottom)
 	        .each("end", function() {
-	          gVoronoi.call(updateVoronoi,
-	            function(d) { return d.cx; },
-	            function(d) { return d.cy + y0(nameAll); },
-	            420);
+
 	        });
 
 	    transition.select(".g-annotations-overall")
@@ -376,12 +370,7 @@ d3.run_bubbles = function(){
 	        .attr("height", height + margin.top + margin.bottom)
 	      .transition()
 	        .delay(720)
-	        .each("end", function() {
-	          gVoronoi.call(updateVoronoi,
-	            function(d) { return d.x; },
-	            function(d) { return y(d.sector) + d.y; },
-	            height);
-	        });
+
 
 	    transition.select(".g-annotations-overall")
 	        .style("opacity", 0)
@@ -428,18 +417,6 @@ d3.run_bubbles = function(){
 	        .attr("cy", function(d) { return d.y; });
 	  }
 
-	  function updateVoronoi(gVoronoi, x, y, height) {
-	    companyClip
-	        .attr("cx", x)
-	        .attr("cy", y);
-
-	    gVoronoi
-	        .style("display", null)
-	      .selectAll("path")
-	        .data(d3.geom.voronoi().x(x).y(y)(companies))
-	        .attr("d", function(d) { return "M" + d.join("L") + "Z"; })
-	        .datum(function(d) { return d.point; });
-	  }
 
 	  function mouseoverAnnotation(re) {
 	    var matches = sectorCompany.filter(function(d) { return re.test(d.name) || re.test(d.alias); }).classed("g-active", true);

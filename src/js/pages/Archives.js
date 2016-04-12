@@ -1,17 +1,18 @@
 import React from "react";
+import foci from "../plugins/multiple_foci.js";
+
 
 export default class Archives extends React.Component {
-	render() {
-		const params = this.props.params;
-		const article = params.article;
-		console.log(this.props);
-		const {filter} =  this.props.location.query;
-		return(
-			<div>
-				<h1>Archives {this.props.params.article}</h1>
-				<h4>filter = {filter}</h4>
-			</div>
+	componentDidMount(){
+		d3.run_multiple_foci();
+	}
 
+	render() {
+		return(
+			<div id="foci_example">
+				<h1>This is my archives page and it works </h1>
+				<div id="chart"></div>
+			</div>
 		);
 	}
 }
