@@ -10,14 +10,15 @@ d3.run_collision_detection = function () {
         .domain([new Date("2015-01-01"), new Date("2015-12-31")])
         .range([margin.left, width - margin.right]);
 
-  var nodes = d3.range(200).map(function(d, i) { 
+  var nodes = d3.range(400).map(function(d, i) { 
     var id = (i % 12) + 1;
-    //var id = ~~(Math.random() * 12)
     var date = "2015-" + id + "-01";
     return {
       radius: Math.random() * 12 + 4,
       id: id,
-      date: date
+      date: date,
+      x: x(new Date(date)),
+      y: 50 + ~~(Math.random() * 2) * 500
     }; 
   }),
       root = nodes[0],
@@ -30,7 +31,8 @@ d3.run_collision_detection = function () {
       .gravity(0)
       .charge(function(d, i) { return 0; })
       .nodes(nodes)
-      .size([width, height]);
+      .size([width, height])
+      .friction(0);
 
   force.start();
 
@@ -99,7 +101,7 @@ d3.run_collision_detection = function () {
 
   function modeTowardsCategoryCenter(alpha){
 
-    var k = alpha * .07;
+    var k = alpha * .3;
     return function(d){
       d.y += (height/2 - d.y) * k;
       d.x += (x(new Date(d.date)) - d.x) * k;
