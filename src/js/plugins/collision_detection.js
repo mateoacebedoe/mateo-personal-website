@@ -4,18 +4,24 @@ d3.run_collision_detection = function () {
   var width = 960,
       height = 500;
 
-  var foci = [{x: 100, y: 250}, 
-              {x: 400, y: 250}, 
-              {x: 700, y: 250}];
+  var margin = {top: 60, right: 60, bottom: 60, left: 60}
 
-  var nodes = d3.range(100).map(function() { 
+  var x = d3.time.scale()
+        .domain([new Date("2015-01-01"), new Date("2015-12-31")])
+        .range([margin.left, width - margin.right]);
+
+  var nodes = d3.range(20).map(function(d, i) { 
+    var id = (i % 12) + 1;
+    //var id = ~~(Math.random() * 12)
+    var date = "2015-" + id + "-01";
     return {
       radius: Math.random() * 12 + 4,
-      id: ~~(Math.random() * 3)
+      id: id,
+      date: date
     }; 
   }),
       root = nodes[0],
-      color = d3.scale.category10();
+      color = d3.scale.category20();
 
   root.radius = 0;
   root.fixed = true;
@@ -32,11 +38,24 @@ d3.run_collision_detection = function () {
       .attr("width", width)
       .attr("height", height);
 
+  var xAxis = d3.svg.axis()
+    .scale(x)
+    .orient('bottom')
+    .ticks(d3.time.months, 1)
+    .tickFormat(d3.time.format('%y, %m'))
+    .tickSize(0)
+    .tickPadding(8);
+
+  svg.append('g')
+    .attr('class', 'x axis')
+    .call(xAxis);
+
   svg.selectAll("circle")
       .data(nodes.slice(1))
     .enter().append("circle")
       .attr("r", function(d) { return d.radius; })
-      .style("fill", function(d, i) { return color(d.id); });
+      .style("fill", function(d, i) { return color(d.id); })
+
 
   force.on("tick", tick);
 
@@ -79,10 +98,15 @@ d3.run_collision_detection = function () {
   }
 
   function modeTowardsCategoryCenter(alpha){
-    var k = alpha * .05;
+
+    var k = alpha * .07;
     return function(d){
-      d.y += (foci[d.id].y - d.y) * k;
-      d.x += (foci[d.id].x - d.x) * k;
+      console.log("date: " + d.date);
+      console.log("returned X: " + x(new Date(d.date)));
+      console.log("d.x: " + d.x);
+      console.log("x: " + (x(new Date(d.date)) - d.x ));
+      d.y += (height/2 - d.y) * k;
+      d.x += (x(new Date(d.date)) - d.x) * k;
     }
   }
 }
