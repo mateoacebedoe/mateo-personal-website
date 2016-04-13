@@ -10,7 +10,7 @@ d3.run_collision_detection = function () {
         .domain([new Date("2015-01-01"), new Date("2015-12-31")])
         .range([margin.left, width - margin.right]);
 
-  var nodes = d3.range(20).map(function(d, i) { 
+  var nodes = d3.range(200).map(function(d, i) { 
     var id = (i % 12) + 1;
     //var id = ~~(Math.random() * 12)
     var date = "2015-" + id + "-01";
@@ -101,10 +101,6 @@ d3.run_collision_detection = function () {
 
     var k = alpha * .07;
     return function(d){
-      console.log("date: " + d.date);
-      console.log("returned X: " + x(new Date(d.date)));
-      console.log("d.x: " + d.x);
-      console.log("x: " + (x(new Date(d.date)) - d.x ));
       d.y += (height/2 - d.y) * k;
       d.x += (x(new Date(d.date)) - d.x) * k;
     }
