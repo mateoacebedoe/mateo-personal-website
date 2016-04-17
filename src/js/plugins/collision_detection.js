@@ -11,8 +11,9 @@ d3.run_collision_detection = function () {
         .range([margin.left, width - margin.right]);
 
   var nodes = d3.range(400).map(function(d, i) { 
-    var id = (i % 12) + 1;
+    var id = Math.random() > .5 ? (~~(Math.random() * 12) + 1) : 3 * (~~(Math.random() * 3) + 1);
     var date = "2015-" + id + "-01";
+     
     return {
       radius: Math.random() * 12 + 4,
       id: id,
@@ -101,10 +102,11 @@ d3.run_collision_detection = function () {
 
   function modeTowardsCategoryCenter(alpha){
 
-    var k = alpha * .3;
+    var x_force_strength = alpha * .3;
+    var y_force_strength = alpha * .3;
     return function(d){
-      d.y += (height/2 - d.y) * k;
-      d.x += (x(new Date(d.date)) - d.x) * k;
+      d.y += (height/2 - d.y) * y_force_strength;
+      d.x += (x(new Date(d.date)) - d.x) * x_force_strength;
     }
   }
 }
