@@ -55,9 +55,7 @@ d3.run_collision_detection = function (events) {
 
   var tip = d3.tip().attr('class', 'd3-tip')
   .offset([-10, 0])
-  .html(function(d) {
-    return "<strong>Hours:</strong> <span style='color:red'>" + d.hours + "</span>";
-  });
+  .html(render_tooltip);
 
   svg.call(tip);
 
@@ -122,5 +120,10 @@ d3.run_collision_detection = function (events) {
   function oldestDate(nodes){
     //TODO
     return new Date("2011-06-01");
+  }
+
+  function render_tooltip(d){
+    return "<strong>Name:</strong> <span style='color:red'>" + d.name + "</span></br></br>" + 
+           "<strong>Hours Spent:</strong> <span style='color:red'>" + d.hours + "</span>";
   }
 }

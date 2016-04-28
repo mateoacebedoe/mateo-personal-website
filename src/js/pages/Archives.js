@@ -20,7 +20,7 @@ export default class Archives extends React.Component {
 	}
 
 	get_data(callback){
-		this.firebaseRef = new Firebase("https://qbwsf2hj0i8.firebaseio-demo.com/events");
+		this.firebaseRef = new Firebase("https://mae-personal-website.firebaseio.com/events");
 
 		var events = null;
 
