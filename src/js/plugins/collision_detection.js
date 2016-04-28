@@ -1,8 +1,10 @@
 import d3 from "d3";
+import d3tip from "d3-tip";
 
 d3.run_collision_detection = function (events) {
 
-  var width = 960,
+  var nodes = events,
+      width = 960,
       height = 500;
 
   var margin = {top: 60, right: 60, bottom: 60, left: 60}
@@ -11,34 +13,22 @@ d3.run_collision_detection = function (events) {
         .domain([oldestDate(nodes), Date.now()])
         .range([margin.left, width - margin.right]);
 
-  var randomNodes = d3.range(100).map(function(d, i) { 
-    var id = Math.random() > .5 ? (~~(Math.random() * 12) + 1) : 3 * (~~(Math.random() * 3) + 1);
-    var date = "2015-" + id + "-01";
-     
-    return {
-      radius: Math.random() * 12 + 4,
-      id: id,
-      date: date,
-      x: x(new Date(date)),
-      y: 50 + ~~(Math.random() * 2) * 500
-    }; 
-  })
+  var y0 = d3.scale.ordinal()
+        .domain(["overall"])
+        .range([height/2]);
 
-  var nodes = events;
-
-  nodes.forEach(function(d){
-    d.radius = Math.random() * 12 + 4;
-    d.x = x(new Date(d.date)),
-    d.y = 50 + ~~(Math.random() * 2) * 500
-  });
+  var radius = d3.scale.linear()
+        .domain([1,2000])
+        .range([10,70]);
 
   var color = d3.scale.category10();
 
   var force = d3.layout.force()
       .gravity(0.05)
       .charge(function(d, i) { return 0; })
-      .nodes(nodes)
-      .size([width, height]);
+      .nodes(events)
+      .size([width, height])
+      .friction(.05);
 
   force.start();
 
@@ -63,25 +53,19 @@ d3.run_collision_detection = function (events) {
       .enter()
       .append("g");
 
+  var tip = d3.tip().attr('class', 'd3-tip')
+  .offset([-10, 0])
+  .html(function(d) {
+    return "<strong>Hours:</strong> <span style='color:red'>" + d.hours + "</span>";
+  });
 
-  var tooltip = d3.select("body")
-    .append("div")
-    .style("position", "absolute")
-    .style("z-index", "10")
-    .style("visibility", "hidden")
-    .text("a simple tooltip");
+  svg.call(tip);
 
   circles.append("circle")
-      .attr("r", function(d) { return d.radius; })
+      .attr("r", function(d) { return radius(d.hours); })
       .style("fill", function(d) { return color(d.category); })
-      .on("mouseover", function(d){
-        console.log(d);
-        tooltip.text(d.date);
-        return tooltip.style("visibility", "visible");
-      })
-      .on("mousemove", function(){return tooltip.style("top", 
-        (d3.event.pageY-10)+"px").style("left",(d3.event.pageX+10)+"px");})
-      .on("mouseout", function(){return tooltip.style("visibility", "hidden");});
+      .on("mouseover", tip.show)
+      .on("mouseout", tip.hide);
 
 
   force.on("tick", tick);
@@ -92,7 +76,7 @@ d3.run_collision_detection = function (events) {
         n = nodes.length;
     while (++i < n) q.visit(collide(nodes[i]));
 
-    //nodes.forEach(modeTowardsCategoryCenter(e.alpha));
+    nodes.forEach(modeTowardsCategoryCenter(e.alpha));
 
     svg.selectAll("circle")
         .attr("cx", function(d) { return d.x; })
@@ -110,7 +94,7 @@ d3.run_collision_detection = function (events) {
         var x = node.x - quad.point.x,
             y = node.y - quad.point.y,
             l = Math.sqrt(x * x + y * y),
-            r = node.radius + quad.point.radius;
+            r = radius(node.hours) + radius(quad.point.hours);
         if (l < r) {
           l = (l - r) / l * .5;
           node.x -= x *= l;
@@ -124,16 +108,14 @@ d3.run_collision_detection = function (events) {
   }
 
   function modeTowardsCategoryCenter(alpha){
+     var force_strength = alpha * .3;
 
-    // var x_force_strength = alpha * .3;
-    // var y_force_strength = alpha * .3;
-
-    var x_force_strength = 1;
-    var y_force_strength = 1;
+    //var x_force_strength = 1;
+    //var y_force_strength = 1;
 
     return function(d){
-      d.y += (height/2 - d.y) * y_force_strength;
-      d.x += (x(new Date(d.date)) - d.x) * x_force_strength;
+      d.y += (y0("overall") - d.y) * force_strength;
+      d.x += (x(new Date(d.date)) - d.x) * force_strength;
     }
   }
 
